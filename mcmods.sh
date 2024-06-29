@@ -9,11 +9,11 @@ if [ "$action" == "load" ]; then
 
     if ! [ -e ./mods/.current ] && [ "$3" != "--overwrite" ]; then
         echo "Warning: version file not found. Maybe you haven't saved at least once yet?
-If this is intended, use --overwrite to force operation"
+If this is intended, use --overwrite to force operation" >&2
         exit 1
     elif ! diff -r --exclude=".current" ./mods/ ./modlib/"$(cat ./mods/.current)"/ > /dev/null 2>&1 && [ "$3" != "--overwrite" ]; then
         echo "Warning: mismatch between last loaded/saved and current. Did you forget to sync?
-If this is intended, use --overwrite to force operation"
+If this is intended, use --overwrite to force operation" >&2
         exit 1
     fi
 
@@ -27,13 +27,13 @@ elif [ "$action" == "save" ] || [ "$action" == "sync" ]; then
     if [ "$action" == "save" ]; then
         if [ -d ~/.minecraft/modlib/"$version" ] && [ "$3" != "--overwrite" ]; then
             echo "Warning: $version is already present.
-If this is intended, use --overwrite to force operation"
+If this is intended, use --overwrite to force operation" >&2
             exit 1
         fi
         echo "$version" > ./mods/.current
     elif [ "$action" == "sync" ]; then
         if ! [ -e ./mods/.current ]; then
-            echo "Error: version file not found. Maybe you haven't saved at least once yet?"
+            echo "Error: version file not found. Maybe you haven't saved at least once yet?" >&2
             exit 1
         fi
         version=$(cat ./mods/.current)
@@ -49,7 +49,7 @@ elif [ "$action" == "current" ]; then
         
       echo $(cat ./mods/.current), $(find "./mods" -type f | wc -l) mods
     else
-        echo "Error: version file not found. Maybe you haven't saved at least once yet?"
+        echo "Error: version file not found. Maybe you haven't saved at least once yet?" >&2
     fi
 
 elif [ "$action" == "list" ]; then
@@ -57,7 +57,7 @@ elif [ "$action" == "list" ]; then
 
 elif [ "$action" == "delete" ]; then
     if ! [ -d "./modlib/$version" ]; then
-        echo "Error: version '$version' not found"
+        echo "Error: version '$version' not found" >&2
         exit 1
     fi
 
@@ -80,9 +80,9 @@ Possible actions:
   current:                  Check which version is current
   help:                     Print out help message
 Possible flags:
-  --overwrite:              Risk losing data and overwrite"
+  --overwrite:              Risk losing data and allow overwrite"
 
 else
-    echo "Error: action '$action' was not understood, try 'mcmods help'"
+    echo "Error: action '$action' was not understood, try 'mcmods help'" >&2
     exit 1
 fi
