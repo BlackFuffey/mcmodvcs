@@ -2,58 +2,76 @@
 
 action=$1
 version=$2
+[ "$3" == "--overwrite" ]
+overwrite=$?;
 
-cd ~/.minecraft/ || exit
+
+cd ~/.minecraft/ || { echo "Error: cannot access ~/.minecraft"; exit 1; }
 
 if [ "$action" == "load" ]; then
+    
+    if $overwrite; then
+      if ! [ -e ./modlib/.current ]; then
+          echo "Warning: version file not found. Maybe you haven't saved at least once yet?
+  If this is intended, use --overwrite to force operation" >&2
+          exit 1
+      elif ! diff -r ./mods/ ./modlib/"$(cat ./modlib/.current 2>/dev/null)"/ > /dev/null 2>&1; then
+          echo "Warning: mismatch between last loaded/saved and current. Did you forgot to sync?
+  If this is intended, use --overwrite to force operation" >&2
+          exit 1
+      fi
+    fi
 
-    if ! [ -e ./mods/.current ] && [ "$3" != "--overwrite" ]; then
-        echo "Warning: version file not found. Maybe you haven't saved at least once yet?
-If this is intended, use --overwrite to force operation" >&2
-        exit 1
-    elif ! diff -r --exclude=".current" ./mods/ ./modlib/"$(cat ./mods/.current)"/ > /dev/null 2>&1 && [ "$3" != "--overwrite" ]; then
-        echo "Warning: mismatch between last loaded/saved and current. Did you forget to sync?
-If this is intended, use --overwrite to force operation" >&2
+    if ! [ -d ./modlib/"$version" ]; then
+        echo "Error: version $version not found"
         exit 1
     fi
 
-    echo "$version" > ~/.minecraft/mods/.current
-    rm -rf ./mods/
-    mkdir ./mods/
+    rm -rf ./mods/*
     cp -r ./modlib/"$version"/* ./mods/
+    echo "$version" > ./modlib/.current
 
 elif [ "$action" == "save" ] || [ "$action" == "sync" ]; then
 
+    if [ "$version" == ".current" ]; then
+        echo "Error: Illegal version name" >&2
+        exit 1
+    fi
+
     if [ "$action" == "save" ]; then
-        if [ -d ~/.minecraft/modlib/"$version" ] && [ "$3" != "--overwrite" ]; then
+        if [ -d ./modlib/"$version" ] && $overwrite; then
             echo "Warning: $version is already present.
 If this is intended, use --overwrite to force operation" >&2
             exit 1
         fi
-        echo "$version" > ./mods/.current
+        echo "$version" > ./modlib/.current
     elif [ "$action" == "sync" ]; then
-        if ! [ -e ./mods/.current ]; then
+        if ! [ -e ./modlib/.current ]; then
             echo "Error: version file not found. Maybe you haven't saved at least once yet?" >&2
             exit 1
         fi
-        version=$(cat ./mods/.current)
+        version=$(cat ./modlib/.current)
+        if ! [ -d ./modlib/"$version" ]; then
+            echo "Error: version file is pointing to a non-existance version ($version). Maybe it was deleted?
+To reconstruct the save, run 'mcmods save $version'"
+            exit 1
+        fi
     fi
 
     rm -rf ./modlib/"$version"
     mkdir -p ./modlib/"$version"
     cp -r ./mods/* ./modlib/"$version"/
-    rm -f ./modlib/"$version"/.current
 
 elif [ "$action" == "current" ]; then
-    if [ -e ./mods/.current ]; then
+    if [ -e ./modlib/.current ]; then
         
-      echo $(cat ./mods/.current), $(find "./mods" -type f | wc -l) mods
+      echo $(cat ./modlib/.current), $(find "./mods" -type f | wc -l) mods
     else
         echo "Error: version file not found. Maybe you haven't saved at least once yet?" >&2
     fi
 
 elif [ "$action" == "list" ]; then
-    ls -1 ~/.minecraft/modlib/ | paste -sd " "
+    ls -1 ./modlib/ | paste -sd " "
 
 elif [ "$action" == "delete" ]; then
     if ! [ -d "./modlib/$version" ]; then
@@ -67,7 +85,7 @@ elif [ "$action" == "delete" ]; then
     if ! [ "$confirm" == "y" ] && ! [ "$confirm" == "Y" ]; then
         exit 0
     fi
-    rm -rf ~/.minecraft/modlib/"$version"
+    rm -rf ./modlib/"$version"
 
 elif [ "$action" == "help" ]; then
     echo "Usage: mcmods <action> {parameter} [flag]
