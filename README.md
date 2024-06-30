@@ -5,7 +5,7 @@ A version control system shell script for managing Minecraft mods
 Available as `mcmodvcs` in AUR
 ### Other Linux distro
 Download and copy `mcmods.sh` to a directory under $PATH of your choice and rename to `mcmods`\
-For example, to download and install to `/usr/bin` using wget:\
+For example, to download and install to `/usr/bin` using wget:
 ``` 
 # wget https://raw.githubusercontent.com/BlackFuffey/mcmodvcs/main/mcmods.sh -O /usr/bin/mcmods
 ```
