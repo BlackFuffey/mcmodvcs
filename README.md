@@ -7,7 +7,7 @@ Available as `mcmodvcs` in AUR
 ### Other Linux distro
 Download and copy `mcmods.sh` to a directory under $PATH of your choice and rename to `mcmods`
 For example, to download and install to /usr/bin:
-``` # mv /path/to/mcmods.sh /usr/bin/mcmods ```
+``` mv /path/to/mcmods.sh /usr/bin/mcmods ```
 ---
 # Basic usage
 You can create a snapshot of your current mods folder by using
