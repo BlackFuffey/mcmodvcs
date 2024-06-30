@@ -12,9 +12,12 @@ For example, to download and install to `/usr/bin` using wget:
 # Basic usage
 You can create a snapshot of your current mods by using\
 ``` mcmods save <name> ```\
+\
 To load a snapshot, use\
 ``` mcmods load <name> ```\
+\
 To overwrite last loaded/saved snapshot with your current mods folder, use\
 ``` mcmods sync ```\
+\
 For list of all functionalities, use\
 ``` mcmods help ```
