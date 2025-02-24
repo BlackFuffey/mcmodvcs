@@ -1,5 +1,6 @@
 # mcmodvcs
-A version control system shell script for managing Minecraft mods
+A version control system shell script for managing Minecraft mods \
+(Please note this is a buggy mess. Use with caution.)
 # Installation
 ### Arch Linux
 Available as `mcmodvcs` in AUR
